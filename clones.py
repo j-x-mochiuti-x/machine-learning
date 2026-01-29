@@ -17,8 +17,6 @@ modelo.fit(X=x, y=y)
 
 
 # Arvore de decisão plotada
-plt.figure(figsize=(12,8))
-tree.plot_tree(modelo, feature_names=variaves, class_names=modelo.classes_, filled=True)
+plt.figure(figsize=(8,4))
+tree.plot_tree(modelo, max_depth=3,feature_names=variaves, class_names=modelo.classes_, filled=True)
 plt.show()
-
-# %%
