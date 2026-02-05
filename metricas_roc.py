@@ -123,8 +123,11 @@ plt.legend([
 ])
 
 # %%
-
 pd.Series({"model": reg, "features":features}).to_pickle("model_feliz.pkl")
 # %%
+import joblib
+import pandas as pd
 
-df_analise.columns
+model = pd.read_pickle("model_feliz.pkl")
+joblib.dump(model, "model_feliz.joblib")
+# %%

@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import joblib
+model = joblib.load("model_feliz.joblib")
 
 st.markdown("Descubra a felicidade.app")
 
@@ -36,7 +38,7 @@ with col3:
 
 
 dados = {'Como conheceu o Téo Me Why?': redes_conhece,
-         'Quantos cursos acompanhou do Téo Me Why?': anos,
+         'Quantos cursos acompanhou do Téo Me Why?': cursos,
          'Curte games?':videogame,
          'Curte futebol?':futebol,
          'Curte livros?':livros,
@@ -105,5 +107,22 @@ df_template = pd.DataFrame(columns=['Como conheceu o Téo Me Why?_Amigos',
        'Curte jogos de fórmula 1?', 'Curte jogos de MMA?', 'Idade',
        'pessoa feliz'])
 
-pd.concat([df_template, df]).fillna(0)
-st.dataframe(df)
+df_dummies = pd.get_dummies(df, columns=dummy_vars)
+
+df_final = df_dummies.reindex(
+    columns=model['features'],
+    fill_value=0
+)
+
+df = pd.concat([df_template, df]).fillna(0)
+
+proba = model["model"].predict_proba(df[model['features']])[:,1][0]
+
+if proba > 0.7:
+    st.success(f"Você é uma pessoa feliz! Probabilidade: {100 * proba:.0f}%")
+
+elif proba > 0.4:
+    st.warning(f"Você é uma pessoa meio feliz! Probabilidade: {100 * proba:.0f}%")
+
+else:
+    st.error(f"Você é uma pessoa nada feliz! Probabilidade: {100 * proba:.0f}%")
