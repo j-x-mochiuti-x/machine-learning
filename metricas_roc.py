@@ -1,14 +1,12 @@
+# %%
 import pandas as pd
 
 url = "https://docs.google.com/spreadsheets/d/1YQBQ3bu1TCmgrRch1gzW5O4Jgc8huzUSr7VUkxg0KIw/export?gid=283387421&format=csv"
 
 df = pd.read_csv(url)
-df.head()
 
 df.columns
-# %%
 
-df['Posição da cadeira (senioridade)'].sort_values().unique()
 
 # %%
 df = df.replace({"Sim":1, "Não":0})
@@ -38,18 +36,21 @@ df_analise['pessoa feliz'] = df['Você se considera uma pessoa feliz?'].copy()
 df_analise
 
 # %%
+from sklearn import tree
+from sklearn import naive_bayes
+from sklearn import linear_model
 
 features = df_analise.columns[:-1].tolist()
 X = df_analise[features]
 y = df_analise['pessoa feliz']
 
-from sklearn import tree
-from sklearn import naive_bayes
-from sklearn import linear_model
+y = y.astype(int)
 
 arvore = tree.DecisionTreeClassifier(random_state=42,
                                      min_samples_leaf=6,
                                      )
+
+
 arvore.fit(X, y)
 
 naive = naive_bayes.GaussianNB()
@@ -64,6 +65,7 @@ arvore_predict = arvore.predict(X)
 arvore_predict
 
 df_predict = df_analise[['pessoa feliz']].copy()
+df_predict['pessoa feliz'] = df_predict['pessoa feliz'].astype(int)
 df_predict['predict_arvore'] = arvore_predict
 df_predict['proba_arvore'] = arvore.predict_proba(X)[:,1]
 
@@ -124,6 +126,5 @@ plt.legend([
 
 pd.Series({"model": reg, "features":features}).to_pickle("model_feliz.pkl")
 # %%
-
 
 df_analise.columns
